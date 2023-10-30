@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import dj_database_url
 import os.path
 from pathlib import Path
 
@@ -30,7 +31,7 @@ SECRET_KEY = 'django-insecure-gr^$lfl0+2#c4!)6ja4i(u)&c_i219xz*2+%$*y#4tgp)*zoks
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', '.vercel.app']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.vercel.app']
 
 WSGI_APPLICATION = 'vercel_app.wsgi.app'
 
@@ -136,16 +137,6 @@ PROJECT_ROOT = os.path.normpath(os.path.dirname(__file__))
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 STATIC_URL = '/static/'
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': os.environ.get("DB_NAME"),
-#         'USER': os.environ.get("DB_USER"),
-#         'PASSWORD': os.environ.get("DB_PASSWORD"),
-#         'HOST': os.environ.get("DB_HOST"),
-#         'PORT': os.environ.get("DB_PORT"),
-#         'OPTIONS': {
-#             'sslmode': 'require',
-#         }
-#     }
-# }
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+DATABASES = {'default': dj_database_url.config(default=DATABASE_URL)}
