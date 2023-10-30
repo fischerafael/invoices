@@ -137,6 +137,9 @@ PROJECT_ROOT = os.path.normpath(os.path.dirname(__file__))
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 STATIC_URL = '/static/'
 
-DATABASE_URL = os.environ.get('DATABASE_URL')
-
-DATABASES = {'default': dj_database_url.config(default=DATABASE_URL)}
+if 'DATABASE_URL' in os.environ:
+    DATABASE_URL = os.environ.get('DATABASE_URL')
+    print('USING PG')
+    DATABASES = {'default': dj_database_url.config(default=DATABASE_URL)}
+else:
+    print('USING SQLITE')
