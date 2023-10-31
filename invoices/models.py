@@ -42,14 +42,19 @@ class Invoice(models.Model):
     services = models.ManyToManyField(
         Service, through='InvoiceService', blank=True)
 
-    def calculate_total(self):
+    @classmethod
+    def find_invoices_by_user_id(cls, user_id: int):
+        invoices = cls.objects.filter(user_id=user_id)
+        return invoices
+
+    def __calculate_total(self):
         total = 0
         for invoice_service in self.invoiceservice_set.all():
             total += invoice_service.quantity * invoice_service.service.base_rate
         return total
 
     def __str__(self):
-        total = self.calculate_total()
+        total = self.__calculate_total()
         return f"{self.number} - {self.date} (Total: {total} {self.currency})"
 
 
