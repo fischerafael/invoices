@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.core.validators import MinLengthValidator
 
 
 CURRENCIES = [
@@ -31,11 +32,12 @@ class Service(models.Model):
 
 
 class Invoice(models.Model):
-    number = models.CharField(max_length=30)
-    date = models.DateTimeField()
+    number = models.CharField(max_length=30,  validators=[
+                              MinLengthValidator(8)])
+    date = models.DateField()
     currency = models.CharField(max_length=10, choices=CURRENCIES)
     payment_currency = models.CharField(max_length=10, choices=CURRENCIES)
-    payment_terms = models.CharField(max_length=10)
+    payment_terms = models.DateField()
 
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
