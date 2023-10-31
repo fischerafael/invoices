@@ -11,36 +11,46 @@ from invoices.use_cases import InvoicesUseCases
 from users.models import CustomUser
 
 
-class ClientSerializer(serializers.ModelSerializer):
+class InvoicesSerializerClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Client
-        fields = '__all__'
+        exclude = ['id']
 
 
-class UserSerializer(serializers.ModelSerializer):
+class InvoicesSerializerUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['email']
+        fields = ['email', 'first_name', 'last_name']
 
 
-class ServiceSerializer(serializers.ModelSerializer):
-    quantity = serializers.SerializerMethodField()
+class InvoicesSerializerServiceSerializer(serializers.ModelSerializer):
+    rate = serializers.SerializerMethodField()
+    vat = serializers.SerializerMethodField()
+
+    def get_rate(self, obj):
+        return float(obj.base_rate)
+
+    def get_vat(self, obj):
+        return float(obj.vat)
 
     class Meta:
         model = models.Service
-        fields = '__all__'
+        fields = ['name', 'details', 'unit', 'rate', 'vat']
 
-    def get_quantity(self, service):
-        invoice_services = models.InvoiceService.objects.filter(
-            service=service)
-        print(invoice_services)
-        return 0
+
+class InvoicesSerializerInvoiceServiceSerializer(serializers.ModelSerializer):
+    service = InvoicesSerializerServiceSerializer()
+
+    class Meta:
+        model = models.InvoiceService
+        fields = ['quantity', 'service']
 
 
 class InvoicesSerializer(serializers.ModelSerializer):
-    client = ClientSerializer()
-    user = UserSerializer()
-    services = ServiceSerializer(many=True, read_only=True)
+    client = InvoicesSerializerClientSerializer()
+    user = InvoicesSerializerUserSerializer()
+    services = InvoicesSerializerInvoiceServiceSerializer(
+        many=True, source='invoiceservice_set')
 
     class Meta:
         model = models.Invoice
